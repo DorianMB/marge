@@ -7,66 +7,78 @@ const inputs = [
     isEditable: true,
     input: document.getElementById('devis'),
     value: 0,
+    text: null,
   },
   {
     id: 'cart',
     isEditable: true,
     input: document.getElementById('cart'),
     value: 0,
+    text: null,
   },
   {
     id: 'margePourcent',
     isEditable: true,
     input: document.getElementById('margePourcent'),
     value: 0,
+    text: null,
   },
   {
     id: 'taux',
     isEditable: true,
     input: document.getElementById('taux'),
     value: 0,
+    text: null,
   },
   {
     id: 'tauxVR',
     isEditable: false,
     input: document.getElementById('tauxVR'),
     value: '69%',
+    text: 'Valeur constatée suite à une étude réalisée auprès de nos clients,' +
+      ' concernant 109 projets visualisés sur notre outil sur la période 01/01/2022 - 30/08/2022',
   },
   {
     id: 'projectSell',
     isEditable: false,
     input: document.getElementById('projectSell'),
     value: 0,
+    text: null,
   },
   {
     id: 'projectSellVR',
     isEditable: false,
     input: document.getElementById('projectSellVR'),
     value: 0,
+    text: null,
   },
   {
     id: 'ca',
     isEditable: false,
     input: document.getElementById('ca'),
     value: 0,
+    text: null,
   },
   {
     id: 'caVR',
     isEditable: false,
     input: document.getElementById('caVR'),
     value: 0,
+    text: null,
   },
   {
     id: 'marge',
     isEditable: false,
     input: document.getElementById('marge'),
     value: 0,
+    text: null,
   },
   {
     id: 'margeVR',
     isEditable: false,
     input: document.getElementById('margeVR'),
     value: 0,
+    text: null,
   },
 ];
 
@@ -81,6 +93,22 @@ let ca = inputs.find((input) => input.id === 'ca');
 let caVR = inputs.find((input) => input.id === 'caVR');
 let marge = inputs.find((input) => input.id === 'marge');
 let margeVR = inputs.find((input) => input.id === 'margeVR');
+
+// for each value in inputs get all with text different of null
+// for each od them get HTML element with id = id + '-text'
+// set the text of the element to the text of the input
+function updateText() {
+  inputs.forEach(obj => {
+    if (obj.text) {
+      const element = document.getElementById(obj.id + '-text');
+      element.innerText = obj.text;
+      if (obj.id.includes('VR')) {
+        const card = document.getElementById(obj.id.replace('VR', '')).parentElement;
+        card.style.marginBottom = element.offsetHeight + 34 + 'px';
+      }
+    }
+  });
+}
 
 function calculer() {
   // faire les calcule pour la partie sans VR
@@ -104,17 +132,27 @@ function calculer() {
     const res = (devis.value * tauxVR.value.replace('%', '') / 100).toFixed(0);
     projectSellVR.value = res;
     projectSellVR.input.value = res;
+    if (projectSell.value) {
+      projectSellVR.text = '+ ' + (projectSellVR.value - projectSell.value);
+    }
   }
   if (projectSellVR.value && cart.value) {
     const res = projectSellVR.value * cart.value.replace('€', '');
     caVR.value = res + '€';
     caVR.input.value = res + '€';
+    if (ca.value) {
+      caVR.text = '+ ' + (caVR.value.replace('€', '') - ca.value.replace('€', '')) + '€';
+    }
   }
   if (caVR.value && margePourcent.value) {
     const res = (caVR.value.replace('€', '') * margePourcent.value.replace('%', '')) / 100;
     margeVR.value = res + '€';
     margeVR.input.value = res + '€';
+    if (marge.value) {
+      margeVR.text = '+ ' + (margeVR.value.replace('€', '') - marge.value.replace('€', '')) + '€';
+    }
   }
+  updateText();
   console.log(inputs);
 }
 
